@@ -4,22 +4,31 @@ output:
   html_document:
     keep_md: true
 ---
-
+```{r echo=TRUE}
 
 ## Loading and preprocessing the data
-
-
+data <- read.csv("activity.csv")
+data$date <- as.Date(data$date, "%Y-%m-%d")
+data2 <- data[complete.cases(data),]
+#install.packages("dplyr")
+library(dplyr)
 
 ## What is mean total number of steps taken per day?
-
-
+aggregate(data2$steps, list(data2$date), mean)  #lists steps by day
+par(mfrow=c(1,1))
+hist(data2$steps)
+mean(data2$steps)  #37.3826
+median(data2$steps)  #0
 
 ## What is the average daily activity pattern?
 
 
 
 ## Imputing missing values
-
-
+hasdata <- complete.cases(data)
+sum(!hasdata)  #2304
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+```
