@@ -4,11 +4,11 @@ output:
   html_document:
     keep_md: true
 ---
-
+```{r echo=TRUE}
 
 ## Loading and preprocessing the data
 
-
+# table <- read.csv()
 
 ## What is mean total number of steps taken per day?
 
@@ -23,3 +23,8 @@ output:
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+
+
+```
