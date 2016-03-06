@@ -14,19 +14,28 @@ data2 <- data[complete.cases(data),]
 library(dplyr)
 
 ## What is mean total number of steps taken per day?
-aggregate(data2$steps, list(data2$date), mean)  #lists steps by day
+perday <- aggregate(data2$steps, list(data2$date), sum)  #lists steps by day
 par(mfrow=c(1,1))
-hist(data2$steps)
-mean(data2$steps)  #37.3826
-median(data2$steps)  #0
+hist(perday$x, main="Total Steps per Day", xlab="# of Steps", ylab="# of days")
+### see attached histogram
+mean(perday$x)  
+### On average, 10,766.19 steps are taken per day.
+median(perday$x)  #0
+### The median is 10765
 
 ## What is the average daily activity pattern?
-
-
+actpat <- aggregate(data2$steps, list(data2$interval), mean) #groups average steps by interval
+plot(actpat$Group.1, actpat$x, type="l", main="Average Daily Activity Pattern", xlab = "Interval", ylab="Avg # of Steps")
+### see attached line chart
+actpat %>% select(Group.1, x) %>% arrange(x)
+### Interval 835 has the highest average number of steps at 206.17
 
 ## Imputing missing values
 hasdata <- complete.cases(data)
-sum(!hasdata)  #2304
+sum(!hasdata)
+### There are 2304 rows with missing data
+### We will impute the missing data by filling in the mean for that interval. This is backwards looking, but for the sake of the exercise, for each missing data, we will replace the data with the average calculated in the average daily activity pattern.
+******
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
