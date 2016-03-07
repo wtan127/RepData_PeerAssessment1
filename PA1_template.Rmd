@@ -34,8 +34,12 @@ actpat %>% select(Group.1, x) %>% arrange(x)
 hasdata <- complete.cases(data)
 sum(!hasdata)
 ### There are 2304 rows with missing data
-### We will impute the missing data by filling in the mean for that interval. This is backwards looking, but for the sake of the exercise, for each missing data, we will replace the data with the average calculated in the average daily activity pattern.
-******
+### We will impute the missing data by filling in the mean for that interval.
+fdata <- data  #copy over data
+fdata <- fdata %>% group_by(interval) %>% mutate(Intervalmean = mean(steps, na.rm=TRUE)) #fdata now has Intervalmean column with means
+   # new dataset with missing data
+   # histogram with number of steps per day
+   # mean and median and if there is a difference
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
