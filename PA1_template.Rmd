@@ -4,44 +4,95 @@ output:
   html_document:
     keep_md: true
 ---
-```{r echo=TRUE}
+
 
 ## Loading and preprocessing the data
+```{r echo=TRUE}
 data <- read.csv("activity.csv")
 data$date <- as.Date(data$date, "%Y-%m-%d")
 data2 <- data[complete.cases(data),]
 #install.packages("dplyr")
 library(dplyr)
-
+```
 ## What is mean total number of steps taken per day?
+```{r echo=TRUE}
 perday <- aggregate(data2$steps, list(data2$date), sum)  #lists steps by day
 par(mfrow=c(1,1))
 hist(perday$x, main="Total Steps per Day", xlab="# of Steps", ylab="# of days")
+```
 ### see attached histogram
+```{r echo=TRUE}
 mean(perday$x)  
+```
 ### On average, 10,766.19 steps are taken per day.
+```{r echo=TRUE}
 median(perday$x)  #0
+```
 ### The median is 10765
 
 ## What is the average daily activity pattern?
+```{r echo=TRUE}
 actpat <- aggregate(data2$steps, list(data2$interval), mean) #groups average steps by interval
 plot(actpat$Group.1, actpat$x, type="l", main="Average Daily Activity Pattern", xlab = "Interval", ylab="Avg # of Steps")
+```
 ### see attached line chart
+```{r echo=TRUE}
 actpat %>% select(Group.1, x) %>% arrange(x)
+```
 ### Interval 835 has the highest average number of steps at 206.17
 
 ## Imputing missing values
+```{r echo=TRUE}
 hasdata <- complete.cases(data)
 sum(!hasdata)
+```
 ### There are 2304 rows with missing data
 ### We will impute the missing data by filling in the mean for that interval.
+```{r echo=TRUE}
 fdata <- data  #copy over data
+#mdata <- which(is.na(data$steps)) #make vector length of NA's
 fdata <- fdata %>% group_by(interval) %>% mutate(Intervalmean = mean(steps, na.rm=TRUE)) #fdata now has Intervalmean column with means
-   # new dataset with missing data
-   # histogram with number of steps per day
-   # mean and median and if there is a difference
+```
+##code to impute the missing steps as the mean of the interval
+```{r echo=TRUE}
+for(i in 1:length(fdata$date)) {
+	if (is.na(fdata[i , "steps"])){
+		fdata[ i,"steps"] <- fdata[i, "Intervalmean"]
+ 	}
+}
+```
+
+# histogram with number of steps per day
+```{r echo=TRUE}
+fperday <- aggregate(fdata$steps, list(fdata$date), sum)
+hist(fperday$x, main="Total Steps per Day", xlab="# of Steps", ylab="# of days", col="red")
+```
+#please see attached histogram
+
+# mean and median and if there is a difference
+```{r echo=TRUE}
+mean(fperday$x)
+median(fperday$x)
+```
+# mean is 10,766, and median is 10,766. the mean stayed the same, and the median moved up slightly
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-
+# clean data to show weekdays
+```{r echo=TRUE}
+y <- fdata[ , "steps"]
+new <- cbind(y, data)
+new$date <- strptime(new$date, "%Y-%m-%d")
+wkday <- weekdays(new$date)
+new <- cbind(new, wkday)
+weekend <- subset(new, wkday == "Saturday"|wkday == "Sunday", select = c(steps, date, interval))
+weekday <- subset(new, wkday == "Monday"|wkday == "Tuesday"|wkday == "Wednesday"|wkday == "Thursday"|wkday == "Friday", select = c(steps, date, interval))
 ```
+#graph by interval
+```{r echo=TRUE}
+weekdaypat <- aggregate(weekday$steps, list(weekday$interval), mean)
+plot(weekdaypat$Group.1, weekdaypat$x, type="l", main="Weekday", xlab = "Interval", ylab="Avg # of Steps")
+weekendpat <- aggregate(weekend$steps, list(weekend$interval), mean)
+plot(weekendpat$Group.1, weekendpat$x, type="l", main="Weekend", xlab = "Interval", ylab="Avg # of Steps")
+```
+# Please see attached in repository for graph
